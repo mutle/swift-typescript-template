@@ -1,0 +1,14 @@
+#!/bin/bash
+set -e
+
+APP_PATH=Sources/client
+
+rm -rf $APP_PATH/*.{css,js} $APP_PATH/**/*.{css,js}
+
+if [ -d node_modules/octicons ]; then
+  cp -r node_modules/octicons/build/font/octicons.{eot,svg,ttf,woff,woff2} public/
+  cat node_modules/octicons/build/octicons.css node_modules/octicons/build/font/octicons.css > $APP_PATH/octicons.less
+fi
+node_modules/less/bin/lessc $APP_PATH/main.less public/app.css
+
+node node_modules/browserify/bin/cmd.js $APP_PATH/main.tsx -p [ tsify --jsx react --noImplicitAny --strictNullChecks --module commonjs -t es6 ] -o public/app.js

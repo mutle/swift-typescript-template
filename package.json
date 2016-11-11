@@ -1,0 +1,21 @@
+{
+  "name": "swift-typescript-template",
+  "version": "0.0.1",
+  "dependencies": {
+    "@types/history": "2.0.39",
+    "@types/react": "0.14.47",
+    "@types/react-dom": "0.14.18",
+    "@types/react-router": "2.0.38",
+    "octicons": "^4.4.0",
+    "react": "15.3.2",
+    "react-dom": "^15.3.2",
+    "react-router": "^2.7.0",
+    "typescript": "2.0.3"
+  },
+  "browser": {},
+  "devDependencies": {
+    "browserify": "13.1.0",
+    "tsify": "2.0.1",
+    "less": "2.7.1"
+  }
+}

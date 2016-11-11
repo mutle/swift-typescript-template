@@ -1,0 +1,10 @@
+.build
+node_modules
+Packages
+
+public/*.css
+public/*.js
+public/octicons.*
+Sources/client/octicons.less
+
+.DS_Store

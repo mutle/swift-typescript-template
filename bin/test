@@ -1,0 +1,64 @@
+#!/bin/bash
+set -e
+
+if [ "$1" = "-v" ]; then
+  VERBOSE=1
+  shift
+fi
+if [ "$1" = "-vv" ]; then
+  VERBOSE=2
+  shift
+fi
+
+
+test_command="swift test"
+if [ -n "$1" -a -n "$2" ]; then
+  test_command+=" -s $1Tests.$2Test"
+  if [ -n "$3" ]; then
+    test_command+="/test$3"
+  fi
+fi
+
+failed=''
+$test_command 2>&1 | while read -r line; do
+  if echo "$line" | grep -q "error: "; then
+    failed=1
+    echo -e "\033[31m$line\033[0m"
+    continue
+  fi
+  if echo "$line" | grep -q "warning: "; then
+    echo -e "\033[1;37m$line\033[0m"
+    continue
+  fi
+  if echo "$line" | grep -q " failed "; then
+    failed=1
+    echo -e "\033[31m$line\033[0m"
+    continue
+  fi
+  if echo "$line" | grep -q " passed at "; then
+    echo -e "\033[1;32m$line\033[0m"
+    continue
+  fi
+  if echo "$line" | grep -q " passed "; then
+    if [ "$VERBOSE" = "1" ]; then
+      echo -e "\033[32m$line\033[0m"
+    fi
+    continue
+  fi
+  if echo "$line" | grep -q " started."; then
+    if [ "$VERBOSE" = "2" ]; then
+      echo -e "\033[37m$line\033[0m"
+    fi
+    continue
+  fi
+  if echo "$line" | grep -q "Executed "; then
+    echo -e "\033[1;34m$line\033[0m"
+    continue
+  fi
+  echo -e "\033[1;30m$line\033[0m"
+done
+
+if [ -n "$failed" ]; then
+  echo "ERROR: Swift tests failed." >&2
+  exit 1
+fi
