@@ -1,4 +1,5 @@
 import Foundation
+import Axis
 import HTTP
 
 extension Request {
@@ -27,17 +28,26 @@ public struct Logger : Middleware {
     let id = UUID().uuidString
     r.requestId = id
     let t = NSDate.timeIntervalSinceReferenceDate
-    let response = try next.respond(to: request)
-    let t2 = (NSDate.timeIntervalSinceReferenceDate - t) * 1000
-    var message: String = ""
-    message += "r=\(id) method=\(request.method) url=\(request.url) t=\(String(format: "%.00f", t2))ms"
+    var message: String = "r=\(id) method=\(request.method) url=\"\(request.url)\""
+    do {
+      let response = try next.respond(to: request)
+      let t2 = (NSDate.timeIntervalSinceReferenceDate - t) * 1000
+      message += " t=\(String(format: "%.00f", t2))ms"
+      try log(message)
+      return response
+    } catch {
+      let t2 = (NSDate.timeIntervalSinceReferenceDate - t) * 1000
+      message += " error=\"\(error)\" t=\(String(format: "%.00f", t2))ms"
+      try log(message)
+      return try Response(status: .internalServerError, headers: Headers(), filePath: "public/500.html")
+    }
+  }
 
-    if let stream = stream {
+  func log(_ message: String) throws {
+    if let stream = self.stream {
       try stream.write(message, deadline: timeout.fromNow())
     } else {
       print(message)
     }
-
-    return response
   }
 }
