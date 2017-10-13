@@ -1,21 +1,25 @@
-import HTTPServer
+import Foundation
+import web
+import web_swift_server
 
-let index = BasicResponder { request in
-  let headers : Headers = [:]
-  return try Response(status: .ok, headers: headers, filePath: "public/index.html")
-}
 
-let routes = [
-  "/",
+var port: Int = 8080
+if let p = ProcessInfo.processInfo.environment["SERVER_PORT"], let i = Int(p) { port = i }
+
+let indexRoutes : [[Any]] = [
+  ["/"],
 ]
 
-let router = BasicRouter(staticFilesPath: "public") { route in
-  for path in routes {
-    route.add(methods: [.get], path: path, responder: index)
+let log = WebLoggerExtension()
+let router = WebRouter()
+router.addStaticFiles(root: "public")
+for path in indexRoutes {
+  if path.count == 1, let path = path.first as? String {
+    router.route(path, file: "public/index.html")
+  } else {
+    router.route(path, file: "public/index.html")
   }
 }
 
-let contentNegotiation = ContentNegotiationMiddleware(mediaTypes: [.json])
-let log = Logger()
-let server = try Server(port: 8080, middleware: [log, contentNegotiation], responder: router)
-try server.start()
+let server = WebServer(adapter: WebSwiftServerAdapter(), responder: router, extensions: [log], port: port)
+try server.run()

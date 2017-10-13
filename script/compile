@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-[ -n "$CLEAN" ] && swift build --clean
+[ -n "$CLEAN" ] && swift package clean
 swift build 2>&1 | while read -r line; do
   if echo "$line" | grep -q "error: "; then
     failed=1

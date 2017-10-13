@@ -1,15 +1,16 @@
+// swift-tools-version:4.0
+
 import PackageDescription
 
 let package = Package(
   name: "swift-typescript-template",
-  targets: [
-    Target(name: "server"),
+  products: [
+    .executable(name: "server", targets: ["server"])
   ],
   dependencies: [
-    .Package(url: "https://github.com/Zewo/HTTPServer.git", majorVersion: 0, minor: 14),
-    .Package(url: "https://github.com/Zewo/HTTPClient.git", majorVersion: 0, minor: 14)
+    .package(url: "https://github.com/mutle/swift-web.git", .upToNextMajor(from: "0.0.1"))
   ],
-  exclude: [
-    "Sources/client"
+  targets: [
+    .target(name: "server", dependencies: [.productItem(name: "web", package: nil)]),
   ]
 )
